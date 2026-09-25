@@ -33,6 +33,33 @@
       overflow-x: hidden;
     }
 
+    /* Tối ưu hóa khi nhúng vào iframe (như Canva Slides) */
+    body.is-iframe {
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+      height: 100vh !important;
+      width: 100vw !important;
+      justify-content: center !important;
+      background: #000 !important;
+    }
+    body.is-iframe header,
+    body.is-iframe .controls-panel,
+    body.is-iframe .explanation-card {
+      display: none !important;
+    }
+    body.is-iframe .viewport-3d {
+      max-width: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      aspect-ratio: unset !important;
+      margin: 0 !important;
+    }
+    body.is-iframe .slide-canvas {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
     header {
       width: 100%;
       max-width: 1080px;
@@ -398,6 +425,25 @@
       isExploded = false;
       viewport.classList.remove('exploded');
       canvas.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    }
+
+    // Nhận diện tự động khi nhúng trong iframe (như Canva Slides)
+    if (window.self !== window.top) {
+      document.body.classList.add('is-iframe');
+      // Cho phép click vào slide để chuyển động Morph giữa Slide 1 và Slide 2
+      canvas.style.cursor = 'pointer';
+      canvas.addEventListener('click', () => {
+        toggleSlideState();
+      });
+      // Lắng nghe di chuột toàn màn hình iframe
+      window.addEventListener('mousemove', (e) => {
+        if (isExploded) return;
+        const x = e.clientX / window.innerWidth - 0.5;
+        const y = e.clientY / window.innerHeight - 0.5;
+        const rotX = -y * 22;
+        const rotY = x * 26;
+        canvas.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      });
     }
   </script>
 </body>
